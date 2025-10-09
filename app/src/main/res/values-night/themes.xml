@@ -1,0 +1,9 @@
+<resources>
+    <style name="Base.Theme.EVChargeApp" parent="Theme.Material3.Dark.NoActionBar">
+        <item name="colorPrimary">@color/ev_primary</item>
+        <item name="colorOnPrimary">@color/ev_on_primary</item>
+        <item name="colorSecondary">@color/ev_secondary</item>
+        <item name="android:windowBackground">#0E131A</item>
+        <item name="android:statusBarColor">@color/ev_primary</item>
+    </style>
+</resources>

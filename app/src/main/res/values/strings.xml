@@ -1,0 +1,38 @@
+<resources>
+    <string name="app_name">EVCharge</string>
+    <string name="app_brand">EVCharge</string>
+
+    <!-- Login -->
+    <string name="login_title">Sign in</string>
+    <string name="login_hint">Email for Owners, Username for Operators</string>
+    <string name="hint_user_or_email">Email or Username</string>
+    <string name="hint_password">Password</string>
+    <string name="action_login">Login</string>
+    <string name="login_to_register">New owner? Create an account</string>
+
+    <!-- Register -->
+    <string name="register_title">Create Owner Account</string>
+    <string name="hint_nic">NIC</string>
+    <string name="hint_first_name">First name</string>
+    <string name="hint_last_name">Last name</string>
+    <string name="hint_email">Email</string>
+    <string name="hint_phone">Phone</string>
+    <string name="action_create_account">Create Account</string>
+    <string name="register_to_login">Already have an account? Sign in</string>
+
+    <!-- Dashboards -->
+    <string name="owner_dashboard_title">Owner Dashboard</string>
+    <string name="operator_dashboard_title">Operator Dashboard</string>
+    <string name="card_find_stations">Find Stations</string>
+    <string name="card_my_bookings">My Bookings</string>
+    <string name="card_scan_qr">Scan Booking QR</string>
+    <string name="card_coming_next">(coming next)</string>
+    <string name="action_logout">Logout</string>
+    <string name="landing_title">Welcome</string>
+    <string name="landing_subtitle">Charge smarter, drive farther</string>
+    <string name="landing_desc">Sign in as an Owner (email) or Operator (username). New owners can create an account in seconds.</string>
+    <string name="action_get_started">Get Started</string>
+    <string name="action_register_owner">Create Owner Account</string>
+    <!-- API base -->
+    <string name="base_url">https://evcharge-api-kh-cvgdhcfvazekever.eastasia-01.azurewebsites.net/</string>
+</resources>

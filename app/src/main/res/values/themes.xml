@@ -1,0 +1,32 @@
+<resources>
+    <style name="Base.Theme.EVChargeApp" parent="Theme.Material3.Light.NoActionBar">
+        <item name="colorPrimary">@color/ev_primary</item>
+        <item name="colorOnPrimary">@color/ev_on_primary</item>
+        <item name="colorPrimaryContainer">@color/ev_primary_container</item>
+        <item name="colorOnPrimaryContainer">@color/ev_on_primary_container</item>
+
+        <item name="colorSecondary">@color/ev_secondary</item>
+        <item name="colorOnSecondary">@color/ev_on_secondary</item>
+
+        <item name="android:statusBarColor">@color/ev_primary</item>
+        <item name="android:navigationBarColor">@color/ev_surface</item>
+        <item name="android:windowBackground">@color/ev_surface</item>
+
+        <item name="materialButtonStyle">@style/EV.Button</item>
+        <item name="materialCardViewStyle">@style/EV.Card</item>
+    </style>
+
+    <style name="Theme.EVChargeApp" parent="Base.Theme.EVChargeApp" />
+
+    <style name="EV.Button" parent="Widget.Material3.Button">
+        <item name="backgroundTint">@color/ev_primary</item>
+        <item name="android:textColor">@color/ev_on_primary</item>
+        <item name="cornerRadius">16dp</item>
+    </style>
+
+    <style name="EV.Card" parent="Widget.Material3.CardView.Elevated">
+        <item name="cardBackgroundColor">@color/white</item>
+        <item name="cardCornerRadius">20dp</item>
+        <item name="cardUseCompatPadding">true</item>
+    </style>
+</resources>

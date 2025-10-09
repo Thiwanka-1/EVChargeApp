@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- EV theme palette -->
+    <color name="ev_primary">#0B8A6E</color>       <!-- teal/green -->
+    <color name="ev_on_primary">#FFFFFF</color>
+    <color name="ev_primary_container">#CBEADD</color>
+    <color name="ev_on_primary_container">#07372C</color>
+
+    <color name="ev_secondary">#0E5BD4</color>     <!-- blue accent -->
+    <color name="ev_on_secondary">#FFFFFF</color>
+
+    <color name="ev_surface">#F7FAF9</color>
+    <color name="ev_on_surface">#0F172A</color>
+    <color name="ev_outline">#D7E3E0</color>
+
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="error">#B3261E</color>
+</resources>
