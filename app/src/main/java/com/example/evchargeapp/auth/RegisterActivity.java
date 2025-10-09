@@ -7,9 +7,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.evchargeapp.R;
 import com.example.evchargeapp.api.ApiClient;
 import com.example.evchargeapp.api.AuthService;
+import com.example.evchargeapp.api.EvOwnersService;
 import com.example.evchargeapp.models.AuthResponse;
+import com.example.evchargeapp.models.OwnerDto;
 import com.example.evchargeapp.models.OwnerRegisterRequest;
 import com.example.evchargeapp.owner.OwnerDashboardActivity;
+import com.example.evchargeapp.utils.OwnerLocalStore;
 import com.example.evchargeapp.utils.SessionManager;
 
 import retrofit2.Call;
@@ -62,15 +65,43 @@ public class RegisterActivity extends AppCompatActivity {
                     Toast.makeText(RegisterActivity.this, "Registration failed", Toast.LENGTH_SHORT).show();
                     return;
                 }
+
                 AuthResponse a = res.body();
+
+                // 1) save session
                 SessionManager.saveToken(RegisterActivity.this, a.accessToken);
                 SessionManager.saveRole(RegisterActivity.this, a.role);
+
+                // 2) fetch + cache owner profile (newly created owner)
+                fetchAndCacheOwnerProfile(a.accessToken);
+
+                // 3) go to Owner dashboard
                 startActivity(new Intent(RegisterActivity.this, OwnerDashboardActivity.class));
                 finish();
             }
+
             @Override public void onFailure(Call<AuthResponse> call, Throwable t) {
                 Toast.makeText(RegisterActivity.this, "Network error", Toast.LENGTH_SHORT).show();
             }
         });
     }
+
+
+    // inside LoginActivity / RegisterActivity
+    private void fetchAndCacheOwnerProfile(String token){
+        String nic = com.example.evchargeapp.utils.JwtUtil.getSubject(token);
+        if (nic == null) return;
+        EvOwnersService owners = ApiClient.get(this, getString(R.string.base_url)).create(EvOwnersService.class);
+        owners.getByNic(nic).enqueue(new retrofit2.Callback<OwnerDto>() {
+            @Override public void onResponse(retrofit2.Call<OwnerDto> call, retrofit2.Response<OwnerDto> res) {
+                OwnerDto o = res.body();
+                if (o != null) {
+                    OwnerLocalStore store = new OwnerLocalStore(RegisterActivity.this);
+                    store.upsert(o.nic, o.firstName, o.lastName, o.email, o.phone, o.isActive);
+                }
+            }
+            @Override public void onFailure(retrofit2.Call<OwnerDto> call, Throwable t) { /* ignore */ }
+        });
+    }
+
 }

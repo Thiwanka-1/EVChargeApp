@@ -33,6 +33,14 @@
     <string name="landing_desc">Sign in as an Owner (email) or Operator (username). New owners can create an account in seconds.</string>
     <string name="action_get_started">Get Started</string>
     <string name="action_register_owner">Create Owner Account</string>
+
+
+    <string name="tab_home">Home</string>
+    <string name="tab_bookings">Bookings</string>
+    <string name="tab_map">Map</string>
+    <string name="tab_profile">Profile</string>
+    <string name="tab_scan">Scan</string>
+
     <!-- API base -->
     <string name="base_url">https://evcharge-api-kh-cvgdhcfvazekever.eastasia-01.azurewebsites.net/</string>
 </resources>

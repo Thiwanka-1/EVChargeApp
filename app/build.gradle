@@ -41,16 +41,16 @@ dependencies {
     implementation libs.constraintlayout
 
     // Networking (for backend API calls)
-    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
-    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
-    implementation 'com.squareup.okhttp3:logging-interceptor:4.12.0'
+    implementation libs.retrofit
+    implementation libs.converter.gson
+    implementation libs.logging.interceptor
 
     // Google Maps + Location
-    implementation 'com.google.android.gms:play-services-maps:18.2.0'
-    implementation 'com.google.android.gms:play-services-location:21.0.1'
+    implementation libs.play.services.maps
+    implementation libs.play.services.location
 
     // QR Scanner
-    implementation 'com.journeyapps:zxing-android-embedded:4.3.0'
+    implementation libs.zxing.android.embedded
 
     // Testing
     testImplementation libs.junit

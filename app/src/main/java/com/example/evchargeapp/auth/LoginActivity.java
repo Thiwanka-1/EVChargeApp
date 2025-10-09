@@ -8,9 +8,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.evchargeapp.R;
 import com.example.evchargeapp.api.ApiClient;
 import com.example.evchargeapp.api.AuthService;
+import com.example.evchargeapp.api.EvOwnersService;
 import com.example.evchargeapp.models.*;
 import com.example.evchargeapp.operator.OperatorDashboardActivity;
 import com.example.evchargeapp.owner.OwnerDashboardActivity;
+import com.example.evchargeapp.utils.OwnerLocalStore;
 import com.example.evchargeapp.utils.SessionManager;
 
 import retrofit2.Call;
@@ -60,22 +62,50 @@ public class LoginActivity extends AppCompatActivity {
         return new Callback<AuthResponse>() {
             @Override public void onResponse(Call<AuthResponse> call, Response<AuthResponse> res) {
                 if (!res.isSuccessful() || res.body() == null) {
-                    Toast.makeText(LoginActivity.this, "Login failed", Toast.LENGTH_SHORT).show(); return;
+                    Toast.makeText(LoginActivity.this, "Login failed", Toast.LENGTH_SHORT).show();
+                    return;
                 }
+
                 AuthResponse a = res.body();
+
+                // 1) save session
                 SessionManager.saveToken(LoginActivity.this, a.accessToken);
                 SessionManager.saveRole(LoginActivity.this, a.role);
 
+                // 2) if Owner, fetch + cache profile in SQLite (runs async, does NOT block navigation)
                 if ("Owner".equalsIgnoreCase(a.role)) {
+                    fetchAndCacheOwnerProfile(a.accessToken);
                     startActivity(new Intent(LoginActivity.this, OwnerDashboardActivity.class));
                 } else {
                     startActivity(new Intent(LoginActivity.this, OperatorDashboardActivity.class));
                 }
+
+                // 3) close login screen
                 finish();
             }
+
             @Override public void onFailure(Call<AuthResponse> call, Throwable t) {
                 Toast.makeText(LoginActivity.this, "Network error", Toast.LENGTH_SHORT).show();
             }
         };
     }
+
+
+    // inside LoginActivity / RegisterActivity
+    private void fetchAndCacheOwnerProfile(String token){
+        String nic = com.example.evchargeapp.utils.JwtUtil.getSubject(token);
+        if (nic == null) return;
+        EvOwnersService owners = ApiClient.get(this, getString(R.string.base_url)).create(EvOwnersService.class);
+        owners.getByNic(nic).enqueue(new retrofit2.Callback<OwnerDto>() {
+            @Override public void onResponse(retrofit2.Call<OwnerDto> call, retrofit2.Response<OwnerDto> res) {
+                OwnerDto o = res.body();
+                if (o != null) {
+                    OwnerLocalStore store = new OwnerLocalStore(LoginActivity.this);
+                    store.upsert(o.nic, o.firstName, o.lastName, o.email, o.phone, o.isActive);
+                }
+            }
+            @Override public void onFailure(retrofit2.Call<OwnerDto> call, Throwable t) { /* ignore */ }
+        });
+    }
+
 }
