@@ -11,4 +11,7 @@ public class BookingDto {
     public String createdUtc;
     public String updatedUtc;
     public String rejectionReason;
+    // in BookingDto.java
+    public transient String __stationName;
+
 }

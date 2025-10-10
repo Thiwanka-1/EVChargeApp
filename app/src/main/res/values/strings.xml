@@ -41,6 +41,68 @@
     <string name="tab_profile">Profile</string>
     <string name="tab_scan">Scan</string>
 
+
+    <string name="add_booking">Add booking</string>
+    <string name="details">Details</string>
+    <string name="edit">Edit</string>
+    <string name="cancel">Cancel</string>
+    <string name="qr_code">QR Code</string>
+    <string name="ok">OK</string>
+    <string name="scan">Scan</string>
+
+    <string name="profile_title">Owner Profile</string>
+    <string name="personal_info">Personal Information</string>
+    <string name="first_name">First name</string>
+    <string name="last_name">Last name</string>
+    <string name="email">Email</string>
+    <string name="phone">Phone</string>
+    <string name="deactivate">Deactivate</string>
+    <string name="active_yes">Active: Yes</string>
+    <string name="active_no">Active: No</string>
+    <string name="profile_hint">Deactivated accounts can only be reactivated by a back-office officer.</string>
+
+    <string name="booking_new">New Booking</string>
+    <string name="booking_edit">Edit Booking</string>
+    <string name="station">Station</string>
+    <string name="date">Date</string>
+    <string name="start_time">Start time</string>
+    <string name="end_time">End time</string>
+    <string name="tap_to_pick">Tap to pick…</string>
+    <string name="save">Save</string>
+    <string name="availability_hint">Availability will appear after you pick date and station</string>
+    <string name="add">Add</string>
+    <string name="more">More</string>
+    <string name="qr_not_available">QR not available until approved</string>
+    <string name="na">N/A</string>
+    <string name="filter_all">All</string>
+    <string name="filter_upcoming">Upcoming</string>
+    <string name="filter_history">History</string>
+    <string name="search_hint">Search station or status…</string>
+    <string name="no_bookings_yet">No bookings yet</string>
+
+    <string name="error_loading_bookings">Failed to load bookings</string>
+    <string name="network_error">Network error</string>
+    <string name="cancelled">Cancelled</string>
+    <string name="cannot_cancel_rule">Cannot cancel (12h rule / status)</string>
+
+
+    <string name="show_qr">Show QR</string>
+    <string name="navigate">Navigate</string>
+    <string name="copy">Copy</string>
+    <string name="share">Share</string>
+
+        <string name="profile_title_owner">My Profile</string>
+        <string name="nic">NIC</string>
+        <string name="active">Active</string>
+
+    <string name="profile">Profile</string>
+        <string name="user_id">User ID</string>
+        <string name="role">Role</string>
+        <string name="username">Username</string>
+        <string name="new_password">New password (optional)</string>
+        <string name="confirm_password">Confirm password</string>
+
+
     <!-- API base -->
     <string name="base_url">https://evcharge-api-kh-cvgdhcfvazekever.eastasia-01.azurewebsites.net/</string>
 </resources>

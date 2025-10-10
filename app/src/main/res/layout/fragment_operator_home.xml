@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- KPIs -->
+    <LinearLayout
+        android:orientation="horizontal"
+        android:weightSum="4"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <include layout="@layout/view_kpi_card" />
+        <include layout="@layout/view_kpi_card" />
+        <include layout="@layout/view_kpi_card" />
+        <include layout="@layout/view_kpi_card" />
+    </LinearLayout>
+
+    <!-- Assign KPI labels/ids -->
+    <LinearLayout
+        android:id="@+id/kpiRowValues"
+        android:orientation="horizontal"
+        android:weightSum="4"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp">
+
+        <TextView
+            android:id="@+id/kpiStations"
+            style="@style/TextAppearance.Material3.TitleLarge"
+            android:text="0"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:gravity="center_horizontal"
+            android:layout_height="wrap_content"/>
+
+        <TextView
+            android:id="@+id/kpiToday"
+            style="@style/TextAppearance.Material3.TitleLarge"
+            android:text="0"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:gravity="center_horizontal"
+            android:layout_height="wrap_content"/>
+
+        <TextView
+            android:id="@+id/kpiInProgress"
+            style="@style/TextAppearance.Material3.TitleLarge"
+            android:text="0"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:gravity="center_horizontal"
+            android:layout_height="wrap_content"/>
+
+        <TextView
+            android:id="@+id/kpiPending"
+            style="@style/TextAppearance.Material3.TitleLarge"
+            android:text="0"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:gravity="center_horizontal"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+
+    <!-- Labels row -->
+    <LinearLayout
+        android:orientation="horizontal"
+        android:weightSum="4"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="8dp">
+
+        <TextView android:text="My Stations" android:layout_width="0dp" android:layout_weight="1" android:gravity="center" android:layout_height="wrap_content"/>
+        <TextView android:text="Bookings Today" android:layout_width="0dp" android:layout_weight="1" android:gravity="center" android:layout_height="wrap_content"/>
+        <TextView android:text="In Progress" android:layout_width="0dp" android:layout_weight="1" android:gravity="center" android:layout_height="wrap_content"/>
+        <TextView android:text="Pending" android:layout_width="0dp" android:layout_weight="1" android:gravity="center" android:layout_height="wrap_content"/>
+    </LinearLayout>
+
+    <!-- Stations editor -->
+    <TextView
+        android:text="My Stations"
+        style="@style/TextAppearance.Material3.TitleMedium"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <LinearLayout
+        android:id="@+id/stationsContainer"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="8dp"/>
+
+    <!-- Today’s bookings -->
+    <TextView
+        android:text="Today's Bookings"
+        style="@style/TextAppearance.Material3.TitleMedium"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingTop="8dp"/>
+
+    <TextView
+        android:id="@+id/tvEmptyToday"
+        android:text="No bookings today."
+        android:visibility="gone"
+        android:padding="8dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvToday"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabQuickScan"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|bottom"
+        android:layout_marginTop="8dp"
+        android:contentDescription="@string/scan"
+        app:srcCompat="@android:drawable/ic_menu_camera"/>
+</LinearLayout>

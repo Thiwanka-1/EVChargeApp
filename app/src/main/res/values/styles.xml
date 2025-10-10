@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Base style so any @style/EV reference compiles -->
+    <style name="EV">
+        <item name="android:textColor">@color/ev_text</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <style name="EV.Title" parent="EV">
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">20sp</item>
+    </style>
+
+    <style name="EV.Subtitle" parent="EV">
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
+</resources>
