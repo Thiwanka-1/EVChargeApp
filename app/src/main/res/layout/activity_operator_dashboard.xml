@@ -3,15 +3,20 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/ev_surface">
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar_operator"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?attr/colorPrimary"
-        android:theme="@style/ThemeOverlay.Material3.Dark.ActionBar"
-        app:titleCentered="true" />
+        android:backgroundTint="@color/ev_primary"
+        android:background="@color/ev_primary"
+        android:elevation="4dp"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        app:titleCentered="true"
+        app:titleTextColor="@color/ev_on_primary" />
 
     <FrameLayout
         android:id="@+id/operator_container"
@@ -24,6 +29,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/white"
+        android:elevation="8dp"
         app:menu="@menu/menu_operator_bottom"
-        android:elevation="8dp" />
+        app:labelVisibilityMode="labeled" />
 </LinearLayout>

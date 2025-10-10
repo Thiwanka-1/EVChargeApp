@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:fillViewport="true"
     android:background="@color/ev_surface"
     android:layout_width="match_parent"
@@ -10,29 +11,59 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
+        <!-- HERO with logo + title -->
         <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="160dp"
+            android:layout_height="200dp"
             android:background="@drawable/bg_auth_top">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:text="@string/register_title"
-                android:textColor="@color/white"
-                android:textStyle="bold"
-                android:textSize="22sp"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:gravity="center">
+
+                <LinearLayout
+                    android:layout_width="72dp"
+                    android:layout_height="72dp"
+                    android:gravity="center"
+                    android:background="@drawable/bg_card"
+                    android:padding="10dp"
+                    android:elevation="2dp"
+                    android:layout_marginBottom="8dp">
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:src="@drawable/ic_ev_logo"
+                        android:contentDescription="@string/app_brand"/>
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/register_title"
+                    android:textColor="@color/white"
+                    android:textStyle="bold"
+                    android:textSize="22sp"/>
+            </LinearLayout>
         </FrameLayout>
 
+        <!-- OVERLAPPING FORM CARD -->
         <LinearLayout
-            android:orientation="vertical"
-            android:padding="20dp"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/bg_card"
+            android:elevation="3dp"
+            android:translationY="-24dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="8dp"
+            android:padding="20dp">
 
             <!-- NIC -->
             <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilNic"
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
@@ -43,38 +74,45 @@
                     android:hint="@string/hint_nic"/>
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- First -->
+            <!-- First name (block numbers) -->
             <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilFirst"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
+                android:layout_marginTop="10dp">
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etFirst"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="@string/hint_first_name"/>
+                    android:hint="@string/hint_first_name"
+                    android:inputType="textPersonName"
+                    android:digits="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ -'"/>
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Last -->
+            <!-- Last name (block numbers) -->
             <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilLast"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
+                android:layout_marginTop="10dp">
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etLast"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="@string/hint_last_name"/>
+                    android:hint="@string/hint_last_name"
+                    android:inputType="textPersonName"
+                    android:digits="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ -'"/>
             </com.google.android.material.textfield.TextInputLayout>
 
             <!-- Email -->
             <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilEmail"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
+                android:layout_marginTop="10dp">
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etEmail"
                     android:layout_width="match_parent"
@@ -83,26 +121,31 @@
                     android:inputType="textEmailAddress"/>
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Phone -->
+            <!-- Phone (+ and digits only, max 13) -->
             <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilPhone"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
+                android:layout_marginTop="10dp">
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etPhone"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/hint_phone"
-                    android:inputType="phone"/>
+                    android:inputType="phone"
+                    android:digits="+0123456789"
+                    android:maxLength="13"/>
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Password -->
+            <!-- Password with visibility toggle (min 9 chars) -->
             <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilPwd"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
+                app:endIconMode="password_toggle">
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etPwd"
                     android:layout_width="match_parent"
@@ -111,20 +154,31 @@
                     android:inputType="textPassword"/>
             </com.google.android.material.textfield.TextInputLayout>
 
+            <!-- CTA -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnCreate"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
+                android:layout_marginTop="16dp"
                 android:text="@string/action_create_account"
-                android:layout_marginTop="16dp"/>
+                android:textAllCaps="false"
+                android:backgroundTint="@color/ev_primary"
+                android:textColor="@color/ev_on_primary"/>
 
+            <!-- Go to login -->
             <TextView
                 android:id="@+id/tvGoLogin"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
                 android:text="@string/register_to_login"
                 android:textColor="@color/ev_secondary"
-                android:layout_marginTop="14dp"/>
+                android:textSize="14sp"
+                android:gravity="center"/>
         </LinearLayout>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="8dp"/>
     </LinearLayout>
 </ScrollView>

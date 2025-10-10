@@ -34,8 +34,8 @@ public class BookingDetailsDialog extends DialogFragment {
     private static final String ARG_START = "start";
     private static final String ARG_END = "end";
     private static final String ARG_QR = "qr";
+    private static final String ARG_REASON = "reason";   // NEW
 
-    /** Original entry point you already use in other places */
     public static void show(@NonNull FragmentManager fm,
                             @NonNull BookingDto b,
                             @Nullable StationDto st) {
@@ -46,13 +46,13 @@ public class BookingDetailsDialog extends DialogFragment {
         args.putString(ARG_START, b.startTimeUtc);
         args.putString(ARG_END, b.endTimeUtc);
         args.putString(ARG_QR, b.qrCode);
+        args.putString(ARG_REASON, b.rejectionReason);    // NEW
 
         BookingDetailsDialog d = new BookingDetailsDialog();
         d.setArguments(args);
         d.show(fm, "BookingDetailsDialog");
     }
 
-    /** Compatibility alias for your fragment that called BookingDetailsDialog.display(...) */
     public static void display(@NonNull FragmentManager fm,
                                @NonNull BookingDto b,
                                @Nullable StationDto st) {
@@ -69,13 +69,19 @@ public class BookingDetailsDialog extends DialogFragment {
         TextView tvWhen    = v.findViewById(R.id.tvWhen);
         TextView tvQr      = v.findViewById(R.id.tvQr);
 
+        // NEW views
+        View     dividerRej         = v.findViewById(R.id.dividerRej);
+        TextView tvRejectionTitle   = v.findViewById(R.id.tvRejectionTitle);
+        TextView tvRejectionReason  = v.findViewById(R.id.tvRejectionReason);
+
         Bundle a = getArguments();
-        String name = a.getString(ARG_STATION_NAME, "-");
-        String addr = a.getString(ARG_STATION_ADDR, "");
+        String name   = a.getString(ARG_STATION_NAME, "-");
+        String addr   = a.getString(ARG_STATION_ADDR, "");
         String status = a.getString(ARG_STATUS, "-");
-        String start = a.getString(ARG_START, null);
-        String end   = a.getString(ARG_END, null);
-        String qr    = a.getString(ARG_QR, null);
+        String start  = a.getString(ARG_START, null);
+        String end    = a.getString(ARG_END, null);
+        String qr     = a.getString(ARG_QR, null);
+        String reason = a.getString(ARG_REASON, null);  // NEW
 
         tvStation.setText(name);
         tvAddr.setText((addr == null || addr.trim().isEmpty()) ? getString(R.string.na) : addr);
@@ -89,6 +95,23 @@ public class BookingDetailsDialog extends DialogFragment {
             tvQr.setOnLongClickListener(v1 -> {
                 ClipboardManager cm = (ClipboardManager) requireContext().getSystemService(Context.CLIPBOARD_SERVICE);
                 cm.setPrimaryClip(ClipData.newPlainText("qr", qr));
+                return true;
+            });
+        }
+
+        // ---- NEW: show rejection reason when present or when status says Rejected ----
+        boolean isRejected = status != null && status.equalsIgnoreCase("Rejected");
+        boolean hasReason  = reason != null && reason.trim().length() > 0;
+
+        if (isRejected || hasReason) {
+            dividerRej.setVisibility(View.VISIBLE);
+            tvRejectionTitle.setVisibility(View.VISIBLE);
+            tvRejectionReason.setVisibility(View.VISIBLE);
+            tvRejectionReason.setText(hasReason ? reason : getString(R.string.na));
+            // Optional: long-press to copy the reason
+            tvRejectionReason.setOnLongClickListener(copyView -> {
+                ClipboardManager cm = (ClipboardManager) requireContext().getSystemService(Context.CLIPBOARD_SERVICE);
+                cm.setPrimaryClip(ClipData.newPlainText("rejectionReason", tvRejectionReason.getText()));
                 return true;
             });
         }

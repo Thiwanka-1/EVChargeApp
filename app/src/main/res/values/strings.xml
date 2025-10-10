@@ -154,7 +154,48 @@
     <string name="account_deleted">Account deleted</string>
     <string name="delete_failed">Delete failed</string>
 
+    <!-- Booking create/edit client-side & server error messages -->
+    <string name="err_load_stations">Failed to load stations</string>
+    <string name="err_load_booking">Failed to load booking</string>
+    <string name="err_select_station">Select a station</string>
 
-    <!-- API base -->
+    <string name="err_past_date">You can’t book a past date.</string>
+    <string name="err_over_7_days">Bookings must be within 7 days from today.</string>
+
+    <string name="err_time_past_today">Adjusted to the next available time (past time not allowed today).</string>
+    <string name="err_start_past">Start time can’t be in the past.</string>
+    <string name="err_end_past">End time can’t be in the past.</string>
+    <string name="err_end_after_start">End time must be later than the start time.</string>
+
+    <string name="err_12h_rule">Changes are only allowed at least 12 hours before the reservation.</string>
+    <string name="err_overlap">Selected time overlaps another reservation or has no available slots.</string>
+    <string name="err_server_generic">Request rejected by server.</string>
+
+    <string name="msg_created">Created</string>
+    <string name="msg_updated">Updated</string>
+
+    <!-- Availability line -->
+    <string name="availability_slots_prefix">Availability (30-min slots): </string>
+
+    <!-- Short hint when editing -->
+    <string name="station_edit_hint">Station can’t be changed when editing. To use another station, cancel this booking and create a new one.</string>
+
+
+    <!-- Owner profile validations -->
+    <string name="err_first_required">First name is required</string>
+    <string name="err_last_required">Last name is required</string>
+    <string name="err_email_required">Email is required</string>
+    <string name="err_email_invalid">Enter a valid email address</string>
+    <string name="err_phone_required">Phone is required</string>
+    <string name="err_phone_invalid">Phone must be 10 digits or + followed by 11–12 digits</string>
+    <string name="err_name_chars">Only letters are allowed</string>
+
+    <!-- Password inline messages -->
+    <string name="err_pw_current_required">Current password is required</string>
+    <string name="err_pw_new_required">New password is required</string>
+    <string name="err_pw_confirm_required">Please confirm the new password</string>
+
+    <!-- API base --><string name="rejection_reason">Rejection reason</string>
+
     <string name="base_url">https://evcharge-api-kh-cvgdhcfvazekever.eastasia-01.azurewebsites.net/</string>
 </resources>

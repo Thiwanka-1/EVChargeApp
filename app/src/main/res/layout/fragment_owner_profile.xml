@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/ev_bg_page">
+    android:background="@color/ev_bg_page"
+    android:fillViewport="true">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -10,14 +12,14 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <!-- Header -->
+        <!-- ===== Header card ===== -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
+            android:background="@drawable/bg_card"
+            android:elevation="3dp"
             android:padding="16dp"
-            android:background="@color/ev_bg_card"
-            android:elevation="2dp"
             android:layout_marginBottom="12dp">
 
             <TextView
@@ -26,6 +28,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
+            <!-- NIC row -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -47,6 +50,7 @@
                     android:layout_height="wrap_content"/>
             </LinearLayout>
 
+            <!-- Active row -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -69,62 +73,103 @@
             </LinearLayout>
         </LinearLayout>
 
-        <!-- Profile form -->
+        <!-- ===== Profile form card ===== -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp"
-            android:background="@color/ev_bg_card"
-            android:elevation="2dp">
+            android:background="@drawable/bg_card"
+            android:elevation="3dp"
+            android:padding="16dp">
 
-            <TextView style="@style/EV.Subtitle" android:text="@string/first_name"
-                android:layout_width="match_parent" android:layout_height="wrap_content"/>
-            <EditText
-                android:id="@+id/etFirst"
-                android:hint="@string/first_name"
-                android:inputType="textPersonName"
-                android:padding="12dp"
-                android:background="@drawable/bg_field"
-                android:layout_marginTop="6dp"
-                android:layout_width="match_parent" android:layout_height="wrap_content"/>
+            <!-- First name -->
+            <TextView
+                style="@style/EV.Subtitle"
+                android:text="@string/first_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilFirst"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etFirst"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/first_name"
+                    android:inputType="textPersonName"
+                    android:digits="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ -'"/>
+            </com.google.android.material.textfield.TextInputLayout>
 
-            <TextView style="@style/EV.Subtitle" android:text="@string/last_name"
+            <!-- Last name -->
+            <TextView
+                style="@style/EV.Subtitle"
+                android:text="@string/last_name"
                 android:layout_marginTop="12dp"
-                android:layout_width="match_parent" android:layout_height="wrap_content"/>
-            <EditText
-                android:id="@+id/etLast"
-                android:hint="@string/last_name"
-                android:inputType="textPersonName"
-                android:padding="12dp"
-                android:background="@drawable/bg_field"
-                android:layout_marginTop="6dp"
-                android:layout_width="match_parent" android:layout_height="wrap_content"/>
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilLast"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etLast"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/last_name"
+                    android:inputType="textPersonName"
+                    android:digits="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ -'"/>
+            </com.google.android.material.textfield.TextInputLayout>
 
-            <TextView style="@style/EV.Subtitle" android:text="@string/email"
+            <!-- Email -->
+            <TextView
+                style="@style/EV.Subtitle"
+                android:text="@string/email"
                 android:layout_marginTop="12dp"
-                android:layout_width="match_parent" android:layout_height="wrap_content"/>
-            <EditText
-                android:id="@+id/etEmail"
-                android:hint="@string/email"
-                android:inputType="textEmailAddress"
-                android:padding="12dp"
-                android:background="@drawable/bg_field"
-                android:layout_marginTop="6dp"
-                android:layout_width="match_parent" android:layout_height="wrap_content"/>
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilEmail"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etEmail"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/email"
+                    android:inputType="textEmailAddress"/>
+            </com.google.android.material.textfield.TextInputLayout>
 
-            <TextView style="@style/EV.Subtitle" android:text="@string/phone"
+            <!-- Phone -->
+            <TextView
+                style="@style/EV.Subtitle"
+                android:text="@string/phone"
                 android:layout_marginTop="12dp"
-                android:layout_width="match_parent" android:layout_height="wrap_content"/>
-            <EditText
-                android:id="@+id/etPhone"
-                android:hint="@string/phone"
-                android:inputType="phone"
-                android:padding="12dp"
-                android:background="@drawable/bg_field"
-                android:layout_marginTop="6dp"
-                android:layout_width="match_parent" android:layout_height="wrap_content"/>
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilPhone"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etPhone"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/phone"
+                    android:inputType="phone"
+                    android:digits="+0123456789"
+                    android:maxLength="13"/>
+            </com.google.android.material.textfield.TextInputLayout>
 
+            <!-- Actions -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -136,7 +181,7 @@
                     android:text="@string/save"
                     android:layout_weight="1"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="48dp"/>
 
                 <Space android:layout_width="12dp" android:layout_height="1dp"/>
 
@@ -147,63 +192,93 @@
                     android:backgroundTint="@color/ev_error"
                     android:layout_weight="1"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="48dp"/>
             </LinearLayout>
         </LinearLayout>
 
-        <!-- Password card -->
+        <!-- ===== Password & delete card ===== -->
         <LinearLayout
             android:layout_marginTop="12dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp"
-            android:background="@color/ev_bg_card"
-            android:elevation="2dp">
+            android:background="@drawable/bg_card"
+            android:elevation="3dp"
+            android:padding="16dp">
 
-            <TextView style="@style/EV.Title"
+            <TextView
+                style="@style/EV.Title"
                 android:text="@string/change_password"
-                android:layout_width="match_parent" android:layout_height="wrap_content"/>
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
 
-            <TextView style="@style/EV.Subtitle"
+            <!-- Current password -->
+            <TextView
+                style="@style/EV.Subtitle"
                 android:text="@string/current_password"
                 android:layout_marginTop="12dp"
-                android:layout_width="match_parent" android:layout_height="wrap_content"/>
-            <EditText
-                android:id="@+id/etCurPw"
-                android:hint="@string/current_password"
-                android:inputType="textPassword"
-                android:padding="12dp"
-                android:background="@drawable/bg_field"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilCurPw"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
-                android:layout_width="match_parent" android:layout_height="wrap_content"/>
+                app:endIconMode="password_toggle">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etCurPw"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/current_password"
+                    android:inputType="textPassword"/>
+            </com.google.android.material.textfield.TextInputLayout>
 
-            <TextView style="@style/EV.Subtitle"
+            <!-- New password -->
+            <TextView
+                style="@style/EV.Subtitle"
                 android:text="@string/new_password"
                 android:layout_marginTop="12dp"
-                android:layout_width="match_parent" android:layout_height="wrap_content"/>
-            <EditText
-                android:id="@+id/etNewPw"
-                android:hint="@string/new_password"
-                android:inputType="textPassword"
-                android:padding="12dp"
-                android:background="@drawable/bg_field"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilNewPw"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
-                android:layout_width="match_parent" android:layout_height="wrap_content"/>
+                app:endIconMode="password_toggle">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etNewPw"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/new_password"
+                    android:inputType="textPassword"/>
+            </com.google.android.material.textfield.TextInputLayout>
 
-            <TextView style="@style/EV.Subtitle"
+            <!-- Confirm password -->
+            <TextView
+                style="@style/EV.Subtitle"
                 android:text="@string/confirm_password"
                 android:layout_marginTop="12dp"
-                android:layout_width="match_parent" android:layout_height="wrap_content"/>
-            <EditText
-                android:id="@+id/etNewPw2"
-                android:hint="@string/confirm_password"
-                android:inputType="textPassword"
-                android:padding="12dp"
-                android:background="@drawable/bg_field"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilNewPw2"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
-                android:layout_width="match_parent" android:layout_height="wrap_content"/>
+                app:endIconMode="password_toggle">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etNewPw2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/confirm_password"
+                    android:inputType="textPassword"/>
+            </com.google.android.material.textfield.TextInputLayout>
 
+            <!-- Actions -->
             <LinearLayout
                 android:layout_marginTop="18dp"
                 android:layout_width="match_parent"
@@ -215,7 +290,7 @@
                     android:text="@string/change_password"
                     android:layout_weight="1"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="48dp"/>
 
                 <Space android:layout_width="12dp" android:layout_height="1dp"/>
 
@@ -226,9 +301,12 @@
                     android:backgroundTint="@color/ev_error"
                     android:layout_weight="1"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="48dp"/>
             </LinearLayout>
         </LinearLayout>
 
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="8dp"/>
     </LinearLayout>
 </ScrollView>

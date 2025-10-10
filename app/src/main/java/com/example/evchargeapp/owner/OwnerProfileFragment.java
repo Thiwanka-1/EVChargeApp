@@ -2,7 +2,10 @@ package com.example.evchargeapp.owner;
 
 import android.app.AlertDialog;
 import android.os.Bundle;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
+import android.util.Patterns;
 import android.view.*;
 import android.widget.*;
 import androidx.annotation.NonNull;
@@ -16,6 +19,8 @@ import com.example.evchargeapp.models.OwnerDto;
 import com.example.evchargeapp.utils.JwtUtil;
 import com.example.evchargeapp.utils.OwnerLocalStore;
 import com.example.evchargeapp.utils.SessionManager;
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -24,8 +29,9 @@ import retrofit2.Response;
 public class OwnerProfileFragment extends Fragment {
 
     private TextView tvNic, tvActive;
-    private EditText etFirst, etLast, etEmail, etPhone;
-    private EditText etCurPw, etNewPw, etNewPw2;
+    private TextInputEditText etFirst, etLast, etEmail, etPhone;
+    private TextInputEditText etCurPw, etNewPw, etNewPw2;
+    private TextInputLayout tilFirst, tilLast, tilEmail, tilPhone, tilCurPw, tilNewPw, tilNewPw2;
     private Button btnSave, btnDeactivate, btnChangePw, btnDelete;
 
     private EvOwnersService ownersApi;
@@ -39,13 +45,24 @@ public class OwnerProfileFragment extends Fragment {
 
         tvNic = v.findViewById(R.id.tvNic);
         tvActive = v.findViewById(R.id.tvActive);
+
         etFirst = v.findViewById(R.id.etFirst);
         etLast  = v.findViewById(R.id.etLast);
         etEmail = v.findViewById(R.id.etEmail);
         etPhone = v.findViewById(R.id.etPhone);
-        etCurPw = v.findViewById(R.id.etCurPw);
-        etNewPw = v.findViewById(R.id.etNewPw);
-        etNewPw2= v.findViewById(R.id.etNewPw2);
+
+        tilFirst = v.findViewById(R.id.tilFirst);
+        tilLast  = v.findViewById(R.id.tilLast);
+        tilEmail = v.findViewById(R.id.tilEmail);
+        tilPhone = v.findViewById(R.id.tilPhone);
+
+        etCurPw  = v.findViewById(R.id.etCurPw);
+        etNewPw  = v.findViewById(R.id.etNewPw);
+        etNewPw2 = v.findViewById(R.id.etNewPw2);
+        tilCurPw = v.findViewById(R.id.tilCurPw);
+        tilNewPw = v.findViewById(R.id.tilNewPw);
+        tilNewPw2= v.findViewById(R.id.tilNewPw2);
+
         btnSave = v.findViewById(R.id.btnSave);
         btnDeactivate = v.findViewById(R.id.btnDeactivate);
         btnChangePw   = v.findViewById(R.id.btnChangePw);
@@ -60,9 +77,22 @@ public class OwnerProfileFragment extends Fragment {
         String token = (raw != null && raw.startsWith("Bearer ")) ? raw.substring(7) : raw;
         currentNic = JwtUtil.getSubject(token);
 
-        btnSave.setOnClickListener(v1 -> save());
+        // clear errors when typing
+        addClearErrorWatcher(etFirst, tilFirst);
+        addClearErrorWatcher(etLast, tilLast);
+        addClearErrorWatcher(etEmail, tilEmail);
+        addClearErrorWatcher(etPhone, tilPhone);
+        addClearErrorWatcher(etCurPw, tilCurPw);
+        addClearErrorWatcher(etNewPw, tilNewPw);
+        addClearErrorWatcher(etNewPw2, tilNewPw2);
+
+        btnSave.setOnClickListener(v1 -> {
+            if (validateProfileForm()) save();
+        });
         btnDeactivate.setOnClickListener(v12 -> confirmDeactivate());
-        btnChangePw.setOnClickListener(v13 -> attemptChangePassword());
+        btnChangePw.setOnClickListener(v13 -> {
+            if (validatePasswordForm()) attemptChangePassword();
+        });
         btnDelete.setOnClickListener(v14 -> confirmDelete());
 
         bindLocal();
@@ -117,6 +147,83 @@ public class OwnerProfileFragment extends Fragment {
         });
     }
 
+    private boolean validateProfileForm() {
+        boolean ok = true;
+
+        String first = etFirst.getText() == null ? "" : etFirst.getText().toString().trim();
+        String last  = etLast.getText()  == null ? "" : etLast.getText().toString().trim();
+        String email = etEmail.getText() == null ? "" : etEmail.getText().toString().trim();
+        String phone = etPhone.getText() == null ? "" : etPhone.getText().toString().trim();
+
+        // First name: required, letters only
+        if (first.isEmpty()) {
+            tilFirst.setError(getString(R.string.err_first_required));
+            ok = false;
+        } else if (!first.matches("^[A-Za-z][A-Za-z '\\-]*$")) {
+            tilFirst.setError(getString(R.string.err_name_chars));
+            ok = false;
+        } else {
+            tilFirst.setError(null);
+        }
+
+        // Last name: required, letters only
+        if (last.isEmpty()) {
+            tilLast.setError(getString(R.string.err_last_required));
+            ok = false;
+        } else if (!last.matches("^[A-Za-z][A-Za-z '\\-]*$")) {
+            tilLast.setError(getString(R.string.err_name_chars));
+            ok = false;
+        } else {
+            tilLast.setError(null);
+        }
+
+        // Email
+        if (email.isEmpty()) {
+            tilEmail.setError(getString(R.string.err_email_required));
+            ok = false;
+        } else if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            tilEmail.setError(getString(R.string.err_email_invalid));
+            ok = false;
+        } else {
+            tilEmail.setError(null);
+        }
+
+        // Phone: 10 digits OR + 11–12 digits
+        boolean phoneOk = phone.matches("^\\d{10}$") || phone.matches("^\\+\\d{11,12}$");
+        if (phone.isEmpty()) {
+            tilPhone.setError(getString(R.string.err_phone_required));
+            ok = false;
+        } else if (!phoneOk) {
+            tilPhone.setError(getString(R.string.err_phone_invalid));
+            ok = false;
+        } else {
+            tilPhone.setError(null);
+        }
+
+        return ok;
+    }
+
+    private boolean validatePasswordForm() {
+        boolean ok = true;
+
+        String cur = etCurPw.getText() == null ? "" : etCurPw.getText().toString();
+        String n1  = etNewPw.getText() == null ? "" : etNewPw.getText().toString();
+        String n2  = etNewPw2.getText()== null ? "" : etNewPw2.getText().toString();
+
+        if (cur.trim().isEmpty()) { tilCurPw.setError(getString(R.string.err_pw_current_required)); ok = false; }
+        else tilCurPw.setError(null);
+
+        if (n1.trim().isEmpty()) { tilNewPw.setError(getString(R.string.err_pw_new_required)); ok = false; }
+        else if (n1.length() < 6) { tilNewPw.setError(getString(R.string.err_pw_length)); ok = false; }
+        else tilNewPw.setError(null);
+
+        if (n2.trim().isEmpty()) { tilNewPw2.setError(getString(R.string.err_pw_confirm_required)); ok = false; }
+        else if (!n1.equals(n2)) { tilNewPw2.setError(getString(R.string.err_pw_mismatch)); ok = false; }
+        else tilNewPw2.setError(null);
+
+        return ok;
+    }
+
     private void save() {
         if (TextUtils.isEmpty(currentNic)) return;
 
@@ -124,11 +231,6 @@ public class OwnerProfileFragment extends Fragment {
         String last  = etLast.getText().toString().trim();
         String email = etEmail.getText().toString().trim();
         String phone = etPhone.getText().toString().trim();
-
-        if (first.isEmpty() || email.isEmpty()) {
-            Toast.makeText(requireContext(), R.string.err_required_name_email, Toast.LENGTH_SHORT).show();
-            return;
-        }
 
         OwnerDto body = new OwnerDto();
         body.nic = currentNic;
@@ -161,22 +263,9 @@ public class OwnerProfileFragment extends Fragment {
 
     private void attemptChangePassword() {
         if (TextUtils.isEmpty(currentNic)) return;
+
         String cur = etCurPw.getText().toString();
         String n1  = etNewPw.getText().toString();
-        String n2  = etNewPw2.getText().toString();
-
-        if (cur.trim().isEmpty() || n1.trim().isEmpty() || n2.trim().isEmpty()) {
-            Toast.makeText(requireContext(), R.string.err_pw_all_fields, Toast.LENGTH_SHORT).show();
-            return;
-        }
-        if (!n1.equals(n2)) {
-            Toast.makeText(requireContext(), R.string.err_pw_mismatch, Toast.LENGTH_SHORT).show();
-            return;
-        }
-        if (n1.length() < 6) {
-            Toast.makeText(requireContext(), R.string.err_pw_length, Toast.LENGTH_SHORT).show();
-            return;
-        }
 
         EvOwnersService.ChangePasswordRequest body = new EvOwnersService.ChangePasswordRequest();
         body.currentPassword = cur;
@@ -190,6 +279,7 @@ public class OwnerProfileFragment extends Fragment {
                 if (res.isSuccessful()) {
                     etCurPw.setText(""); etNewPw.setText(""); etNewPw2.setText("");
                     Toast.makeText(requireContext(), R.string.pw_changed, Toast.LENGTH_SHORT).show();
+                    tilCurPw.setError(null); tilNewPw.setError(null); tilNewPw2.setError(null);
                 } else {
                     Toast.makeText(requireContext(), R.string.pw_change_failed, Toast.LENGTH_LONG).show();
                 }
@@ -255,15 +345,10 @@ public class OwnerProfileFragment extends Fragment {
                 btnDelete.setEnabled(true);
                 if (!isAdded()) return;
                 if (res.isSuccessful()) {
-                    // wipe local
                     local.clear();
                     SessionManager.clear(requireContext());
                     Toast.makeText(requireContext(), R.string.account_deleted, Toast.LENGTH_LONG).show();
-
-                    // TODO: navigate to login screen in your app
-                    // startActivity(new Intent(requireContext(), LoginActivity.class));
-                    // requireActivity().finish();
-
+                    // Navigate to login if needed
                 } else {
                     Toast.makeText(requireContext(), R.string.delete_failed, Toast.LENGTH_SHORT).show();
                 }
@@ -273,6 +358,16 @@ public class OwnerProfileFragment extends Fragment {
                 if (!isAdded()) return;
                 Toast.makeText(requireContext(), R.string.network_error, Toast.LENGTH_SHORT).show();
             }
+        });
+    }
+
+    private void addClearErrorWatcher(TextInputEditText et, TextInputLayout til) {
+        et.addTextChangedListener(new TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (til.getError() != null) til.setError(null);
+            }
+            @Override public void afterTextChanged(Editable s) {}
         });
     }
 

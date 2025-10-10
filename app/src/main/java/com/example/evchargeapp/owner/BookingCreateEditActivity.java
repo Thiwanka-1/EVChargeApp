@@ -18,6 +18,7 @@ import com.example.evchargeapp.models.BookingUpdateRequest;
 import com.example.evchargeapp.models.StationDto;
 import com.example.evchargeapp.ui.BookingReviewDialog;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -27,7 +28,7 @@ import retrofit2.Response;
 
 public class BookingCreateEditActivity extends AppCompatActivity {
 
-    private TextView tvTitle, tvDate, tvStart, tvEnd, tvAvailability;
+    private TextView tvTitle, tvDate, tvStart, tvEnd, tvAvailability, tvStationHint;
     private Spinner spStation;
     private Button btnSave, btnCancel;
 
@@ -38,7 +39,7 @@ public class BookingCreateEditActivity extends AppCompatActivity {
     private final List<String> stationLabels = new ArrayList<>();
     private static final int TZ_OFFSET_MINUTES_SL = 330; // UTC+5:30 Sri Lanka
 
-    // in-local-time selections
+    // local selections
     private final Calendar dateLocal = Calendar.getInstance();
     private final Calendar startLocal = Calendar.getInstance();
     private final Calendar endLocal = Calendar.getInstance();
@@ -55,6 +56,7 @@ public class BookingCreateEditActivity extends AppCompatActivity {
         tvStart = findViewById(R.id.tvStart);
         tvEnd = findViewById(R.id.tvEnd);
         tvAvailability = findViewById(R.id.tvAvailability);
+        tvStationHint = findViewById(R.id.tvStationHint);
         btnSave = findViewById(R.id.btnSave);
         btnCancel = findViewById(R.id.btnCancel);
 
@@ -62,9 +64,16 @@ public class BookingCreateEditActivity extends AppCompatActivity {
         stationsApi = ApiClient.get(this, base).create(StationsService.class);
         bookingsApi = ApiClient.get(this, base).create(BookingsService.class);
 
-        // defaults: now and +1h
-        startLocal.set(Calendar.MINUTE, (startLocal.get(Calendar.MINUTE) / 30) * 30);
+        // defaults: round to nearest 5 min; end +1h
+        roundTo5Min(startLocal);
         endLocal.setTimeInMillis(startLocal.getTimeInMillis() + 60 * 60 * 1000);
+        // ensure start is not in the past
+        Calendar now = Calendar.getInstance();
+        if (startLocal.before(now)) {
+            startLocal.setTimeInMillis(now.getTimeInMillis());
+            roundTo5Min(startLocal);
+            endLocal.setTimeInMillis(startLocal.getTimeInMillis() + 60 * 60 * 1000);
+        }
 
         tvDate.setOnClickListener(v -> pickDate());
         tvStart.setOnClickListener(v -> pickTime(true));
@@ -79,7 +88,12 @@ public class BookingCreateEditActivity extends AppCompatActivity {
 
         // Editing?
         editingId = getIntent().getStringExtra("bookingId");
-        if (editingId != null) tvTitle.setText(R.string.booking_edit);
+        if (editingId != null) {
+            tvTitle.setText(R.string.booking_edit);
+            spStation.setEnabled(false);          // cannot change station when editing
+            spStation.setAlpha(0.6f);
+            tvStationHint.setVisibility(View.VISIBLE);
+        }
 
         loadStations(() -> {
             if (editingId != null) fetchBooking(editingId);
@@ -106,7 +120,7 @@ public class BookingCreateEditActivity extends AppCompatActivity {
                 after.run();
             }
             @Override public void onFailure(Call<List<StationDto>> call, Throwable t) {
-                Toast.makeText(BookingCreateEditActivity.this, "Failed to load stations", Toast.LENGTH_SHORT).show();
+                Toast.makeText(BookingCreateEditActivity.this, R.string.err_load_stations, Toast.LENGTH_SHORT).show();
                 ArrayAdapter<String> ad = new ArrayAdapter<>(BookingCreateEditActivity.this,
                         android.R.layout.simple_spinner_dropdown_item, stationLabels);
                 spStation.setAdapter(ad);
@@ -118,7 +132,7 @@ public class BookingCreateEditActivity extends AppCompatActivity {
     private void fetchBooking(String id){
         bookingsApi.getById(id).enqueue(new Callback<BookingDto>() {
             @Override public void onResponse(Call<BookingDto> call, Response<BookingDto> res) {
-                if (!res.isSuccessful() || res.body()==null) { Toast.makeText(BookingCreateEditActivity.this, "Failed to load booking", Toast.LENGTH_SHORT).show(); return; }
+                if (!res.isSuccessful() || res.body()==null) { Toast.makeText(BookingCreateEditActivity.this, R.string.err_load_booking, Toast.LENGTH_SHORT).show(); return; }
                 BookingDto b = res.body();
 
                 // station
@@ -138,7 +152,7 @@ public class BookingCreateEditActivity extends AppCompatActivity {
                 renderSelections();
             }
             @Override public void onFailure(Call<BookingDto> call, Throwable t) {
-                Toast.makeText(BookingCreateEditActivity.this, "Network error", Toast.LENGTH_SHORT).show();
+                Toast.makeText(BookingCreateEditActivity.this, R.string.network_error, Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -151,19 +165,39 @@ public class BookingCreateEditActivity extends AppCompatActivity {
     }
 
     private void pickDate(){
+        Calendar today = startOfDay(Calendar.getInstance());
+        Calendar max = startOfDay((Calendar) today.clone());
+        max.add(Calendar.DAY_OF_YEAR, 7); // today + 7 days
+
         DatePickerDialog dlg = new DatePickerDialog(this,
                 (view, y, m, d) -> {
                     dateLocal.set(Calendar.YEAR, y);
                     dateLocal.set(Calendar.MONTH, m);
                     dateLocal.set(Calendar.DAY_OF_MONTH, d);
-                    // snap start/end to same day
+
+                    // keep start/end on same selected day
                     syncDay(startLocal, dateLocal);
                     syncDay(endLocal, dateLocal);
+
+                    // if selected is today and time is in the past -> snap to now
+                    Calendar now = Calendar.getInstance();
+                    if (isSameDay(dateLocal, now) && startLocal.before(now)) {
+                        startLocal.setTimeInMillis(now.getTimeInMillis());
+                        roundTo5Min(startLocal);
+                        endLocal.setTimeInMillis(startLocal.getTimeInMillis() + 60*60*1000);
+                        Toast.makeText(this, R.string.err_time_past_today, Toast.LENGTH_SHORT).show();
+                    }
                     renderSelections();
                 },
                 dateLocal.get(Calendar.YEAR),
                 dateLocal.get(Calendar.MONTH),
                 dateLocal.get(Calendar.DAY_OF_MONTH));
+
+        // restrict selectable days
+        try {
+            dlg.getDatePicker().setMinDate(today.getTimeInMillis());
+            dlg.getDatePicker().setMaxDate(max.getTimeInMillis());
+        } catch (Exception ignored) {}
         dlg.show();
     }
 
@@ -172,6 +206,34 @@ public class BookingCreateEditActivity extends AppCompatActivity {
         new TimePickerDialog(this, (view, hour, minute) -> {
             target.set(Calendar.HOUR_OF_DAY, hour);
             target.set(Calendar.MINUTE, minute - (minute % 5)); // snap to 5-min
+
+            // validate against "today" minimum
+            Calendar now = Calendar.getInstance();
+            if (isSameDay(dateLocal, now)) {
+                Calendar chosen = (Calendar) target.clone();
+                syncDay(chosen, dateLocal);
+                if (start && chosen.before(now)) {
+                    // bump start to now rounded
+                    startLocal.setTimeInMillis(now.getTimeInMillis());
+                    roundTo5Min(startLocal);
+                    Toast.makeText(this, R.string.err_start_past, Toast.LENGTH_SHORT).show();
+                }
+                if (!start) {
+                    // end can't be in the past if today
+                    if (chosen.before(now)) {
+                        endLocal.setTimeInMillis(Math.max(now.getTimeInMillis(), startLocal.getTimeInMillis() + 5*60*1000));
+                        roundTo5Min(endLocal);
+                        Toast.makeText(this, R.string.err_end_past, Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+
+            // end must be after start
+            if (endLocal.getTimeInMillis() <= startLocal.getTimeInMillis()) {
+                endLocal.setTimeInMillis(startLocal.getTimeInMillis() + 30*60*1000); // push by 30min
+                Toast.makeText(this, R.string.err_end_after_start, Toast.LENGTH_SHORT).show();
+            }
+
             renderSelections();
         }, target.get(Calendar.HOUR_OF_DAY), target.get(Calendar.MINUTE), true).show();
     }
@@ -182,10 +244,7 @@ public class BookingCreateEditActivity extends AppCompatActivity {
             tvAvailability.setText(getString(R.string.availability_hint));
             return;
         }
-
         String stationId = stations.get(pos).stationId;
-
-        // BACKEND expects LOCAL calendar day string
         String dateLocalStr = fmtLocal(dateLocal.getTimeInMillis(), "yyyy-MM-dd");
 
         bookingsApi.availability(stationId, dateLocalStr, TZ_OFFSET_MINUTES_SL)
@@ -197,10 +256,8 @@ public class BookingCreateEditActivity extends AppCompatActivity {
                             tvAvailability.setText(getString(R.string.availability_hint));
                             return;
                         }
-
-                        // Show a compact sample around chosen start hour
                         String startHH = fmtLocal(startLocal.getTimeInMillis(), "HH");
-                        StringBuilder sb = new StringBuilder("Availability (30-min slots): ");
+                        StringBuilder sb = new StringBuilder(getString(R.string.availability_slots_prefix));
                         int count = 0;
                         for (BookingsService.AvailabilityResponse.Slot s : res.body().availability) {
                             if (s.time.startsWith(startHH) && count < 4) {
@@ -212,20 +269,45 @@ public class BookingCreateEditActivity extends AppCompatActivity {
                         if (count == 0) sb = new StringBuilder(getString(R.string.availability_hint));
                         tvAvailability.setText(sb.toString());
                     }
-
-                    @Override
-                    public void onFailure(retrofit2.Call<BookingsService.AvailabilityResponse> call, Throwable t) {
+                    @Override public void onFailure(retrofit2.Call<BookingsService.AvailabilityResponse> call, Throwable t) {
                         tvAvailability.setText(getString(R.string.availability_hint));
                     }
                 });
     }
 
-    // ---- SAVE now opens review dialog first ----
+    // ---- SAVE with client validations + specific server errors ----
     private void save(){
         int pos = spStation.getSelectedItemPosition();
-        if (pos < 0 || pos >= stations.size()) { Toast.makeText(this, "Select a station", Toast.LENGTH_SHORT).show(); return; }
+        if (pos < 0 || pos >= stations.size()) {
+            Toast.makeText(this, R.string.err_select_station, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        Calendar now = Calendar.getInstance();
+        Calendar todayStart = startOfDay((Calendar) now.clone());
+        Calendar max = startOfDay((Calendar) todayStart.clone());
+        max.add(Calendar.DAY_OF_YEAR, 7);
+
+        // 1) date: today..+7d only (client-side gate)
+        if (dateLocal.before(todayStart)) {
+            Toast.makeText(this, R.string.err_past_date, Toast.LENGTH_LONG).show();
+            return;
+        }
+        if (dateLocal.after(max)) {
+            Toast.makeText(this, R.string.err_over_7_days, Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        // 2) if today, start must be >= now
+        if (isSameDay(dateLocal, now) && startLocal.before(now)) {
+            Toast.makeText(this, R.string.err_start_past, Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        // 3) end > start
         if (endLocal.getTimeInMillis() <= startLocal.getTimeInMillis()){
-            Toast.makeText(this, "End time must be after start time", Toast.LENGTH_SHORT).show(); return;
+            Toast.makeText(this, R.string.err_end_after_start, Toast.LENGTH_LONG).show();
+            return;
         }
 
         StationDto st = stations.get(pos);
@@ -238,7 +320,6 @@ public class BookingCreateEditActivity extends AppCompatActivity {
 
         String isoStart = toIsoUtc(startLocal.getTimeInMillis());
         String isoEnd   = toIsoUtc(endLocal.getTimeInMillis());
-
         String mode = (editingId == null) ? "create" : "update";
 
         BookingReviewDialog
@@ -253,11 +334,15 @@ public class BookingCreateEditActivity extends AppCompatActivity {
 
                         bookingsApi.create(body).enqueue(new Callback<BookingDto>() {
                             @Override public void onResponse(Call<BookingDto> call, Response<BookingDto> res) {
-                                if (res.isSuccessful()) { Toast.makeText(BookingCreateEditActivity.this, "Created", Toast.LENGTH_SHORT).show(); finish(); }
-                                else Toast.makeText(BookingCreateEditActivity.this, "Server rejected (7-day / overlap / 12h rules)", Toast.LENGTH_LONG).show();
+                                if (res.isSuccessful()) {
+                                    Toast.makeText(BookingCreateEditActivity.this, R.string.msg_created, Toast.LENGTH_SHORT).show();
+                                    finish();
+                                } else {
+                                    showSpecificServerError(res);
+                                }
                             }
                             @Override public void onFailure(Call<BookingDto> call, Throwable t) {
-                                Toast.makeText(BookingCreateEditActivity.this, "Network error", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(BookingCreateEditActivity.this, R.string.network_error, Toast.LENGTH_SHORT).show();
                             }
                         });
                     } else {
@@ -268,11 +353,15 @@ public class BookingCreateEditActivity extends AppCompatActivity {
 
                         bookingsApi.update(editingId, body).enqueue(new Callback<Void>() {
                             @Override public void onResponse(Call<Void> call, Response<Void> res) {
-                                if (res.isSuccessful()) { Toast.makeText(BookingCreateEditActivity.this, "Updated", Toast.LENGTH_SHORT).show(); finish(); }
-                                else Toast.makeText(BookingCreateEditActivity.this, "Update refused (12h / overlap / 7-day)", Toast.LENGTH_LONG).show();
+                                if (res.isSuccessful()) {
+                                    Toast.makeText(BookingCreateEditActivity.this, R.string.msg_updated, Toast.LENGTH_SHORT).show();
+                                    finish();
+                                } else {
+                                    showSpecificServerError(res);
+                                }
                             }
                             @Override public void onFailure(Call<Void> call, Throwable t) {
-                                Toast.makeText(BookingCreateEditActivity.this, "Network error", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(BookingCreateEditActivity.this, R.string.network_error, Toast.LENGTH_SHORT).show();
                             }
                         });
                     }
@@ -280,11 +369,53 @@ public class BookingCreateEditActivity extends AppCompatActivity {
                 .show(getSupportFragmentManager(), "BookingReview");
     }
 
-    // ---- time helpers (API 24 safe) ----
+    private void showSpecificServerError(Response<?> res) {
+        String fallback = getString(R.string.err_server_generic);
+        try {
+            String body = res.errorBody() != null ? res.errorBody().string() : "";
+            if (body == null) body = "";
+            String lower = body.toLowerCase(Locale.US);
+
+            if (lower.contains("7") && lower.contains("day")) {
+                Toast.makeText(this, getString(R.string.err_over_7_days), Toast.LENGTH_LONG).show();
+            } else if (lower.contains("12") && lower.contains("hour")) {
+                // server uses 12h rule for update/cancel
+                Toast.makeText(this, getString(R.string.err_12h_rule), Toast.LENGTH_LONG).show();
+            } else if (lower.contains("overlap")) {
+                Toast.makeText(this, getString(R.string.err_overlap), Toast.LENGTH_LONG).show();
+            } else {
+                Toast.makeText(this, fallback, Toast.LENGTH_LONG).show();
+            }
+        } catch (IOException e) {
+            Toast.makeText(this, fallback, Toast.LENGTH_LONG).show();
+        }
+    }
+
+    // ---- helpers ----
     private static void syncDay(Calendar target, Calendar day){
         target.set(Calendar.YEAR, day.get(Calendar.YEAR));
         target.set(Calendar.MONTH, day.get(Calendar.MONTH));
         target.set(Calendar.DAY_OF_MONTH, day.get(Calendar.DAY_OF_MONTH));
+    }
+
+    private static void roundTo5Min(Calendar c) {
+        int m = c.get(Calendar.MINUTE);
+        c.set(Calendar.MINUTE, m - (m % 5));
+        c.set(Calendar.SECOND, 0);
+        c.set(Calendar.MILLISECOND, 0);
+    }
+
+    private static boolean isSameDay(Calendar a, Calendar b) {
+        return a.get(Calendar.YEAR) == b.get(Calendar.YEAR)
+                && a.get(Calendar.DAY_OF_YEAR) == b.get(Calendar.DAY_OF_YEAR);
+    }
+
+    private static Calendar startOfDay(Calendar c) {
+        c.set(Calendar.HOUR_OF_DAY, 0);
+        c.set(Calendar.MINUTE, 0);
+        c.set(Calendar.SECOND, 0);
+        c.set(Calendar.MILLISECOND, 0);
+        return c;
     }
 
     private static Long parseIsoUtc(String iso){
@@ -309,11 +440,6 @@ public class BookingCreateEditActivity extends AppCompatActivity {
     private static String fmtLocal(long ms, String pattern){
         SimpleDateFormat out = new SimpleDateFormat(pattern, Locale.getDefault());
         out.setTimeZone(TimeZone.getDefault());
-        return out.format(new Date(ms));
-    }
-    private static String fmtUtc(long ms, String pattern){
-        SimpleDateFormat out = new SimpleDateFormat(pattern, Locale.US);
-        out.setTimeZone(TimeZone.getTimeZone("UTC"));
         return out.format(new Date(ms));
     }
 

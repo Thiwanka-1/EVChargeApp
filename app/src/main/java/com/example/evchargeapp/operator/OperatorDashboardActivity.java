@@ -32,8 +32,7 @@ public class OperatorDashboardActivity extends AppCompatActivity {
         nav.setOnItemSelectedListener(item -> {
             Fragment f;
             int id = item.getItemId();
-            if (id == R.id.nav_op_scan) f = new OperatorScanFragment();
-            else if (id == R.id.nav_op_profile) f = new OperatorProfileFragment();
+            if (id == R.id.nav_op_profile) f = new OperatorProfileFragment();
             else f = new OperatorHomeFragment();
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.operator_container, f)

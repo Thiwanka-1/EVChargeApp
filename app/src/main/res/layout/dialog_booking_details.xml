@@ -1,29 +1,68 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:padding="16dp"
-    android:layout_width="match_parent" android:layout_height="wrap_content">
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
 
-    <TextView android:textStyle="bold" android:textSize="16sp"
+    <TextView
         android:id="@+id/tvStation"
-        android:layout_width="match_parent" android:layout_height="wrap_content"/>
+        android:textStyle="bold"
+        android:textSize="16sp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 
-    <TextView android:id="@+id/tvAddr"
+    <TextView
+        android:id="@+id/tvAddr"
         android:textColor="#6B7280"
         android:layout_marginTop="2dp"
-        android:layout_width="match_parent" android:layout_height="wrap_content"/>
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 
-    <TextView android:id="@+id/tvStatus"
+    <TextView
+        android:id="@+id/tvStatus"
         android:layout_marginTop="8dp"
-        android:layout_width="match_parent" android:layout_height="wrap_content"/>
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 
-    <TextView android:id="@+id/tvWhen"
+    <TextView
+        android:id="@+id/tvWhen"
         android:layout_marginTop="2dp"
         android:textColor="#374151"
-        android:layout_width="match_parent" android:layout_height="wrap_content"/>
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 
-    <TextView android:id="@+id/tvQr"
+    <TextView
+        android:id="@+id/tvQr"
         android:layout_marginTop="12dp"
         android:textIsSelectable="true"
         android:textColor="#2563EB"
-        android:layout_width="match_parent" android:layout_height="wrap_content"/>
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <!-- NEW: rejection reason block (hidden unless present) -->
+    <View
+        android:id="@+id/dividerRej"
+        android:visibility="gone"
+        android:layout_marginTop="12dp"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#E5E7EB" />
+
+    <TextView
+        android:id="@+id/tvRejectionTitle"
+        android:visibility="gone"
+        android:layout_marginTop="8dp"
+        android:text="@string/rejection_reason"
+        android:textStyle="bold"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:id="@+id/tvRejectionReason"
+        android:visibility="gone"
+        android:layout_marginTop="4dp"
+        android:textColor="#6B7280"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 </LinearLayout>

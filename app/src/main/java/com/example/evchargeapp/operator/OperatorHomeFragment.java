@@ -39,7 +39,6 @@ public class OperatorHomeFragment extends Fragment {
     private LinearLayout stationsContainer;
     private RecyclerView rvToday;
     private TextView tvEmpty;
-    private FloatingActionButton fabScan;
 
     private StationsService stationsApi;
     private BookingsService bookingsApi;
@@ -61,13 +60,15 @@ public class OperatorHomeFragment extends Fragment {
         stationsContainer = v.findViewById(R.id.stationsContainer);
         rvToday = v.findViewById(R.id.rvToday);
         tvEmpty = v.findViewById(R.id.tvEmptyToday);
-        fabScan = v.findViewById(R.id.fabQuickScan);
 
         String base = getString(R.string.base_url);
         stationsApi = ApiClient.get(requireContext(), base).create(StationsService.class);
         bookingsApi = ApiClient.get(requireContext(), base).create(BookingsService.class);
 
         rvToday.setLayoutManager(new LinearLayoutManager(requireContext()));
+        rvToday.setNestedScrollingEnabled(false);
+        rvToday.setHasFixedSize(false);
+
         adapter = new OperatorBookingsAdapter(new OperatorBookingsAdapter.RowAction() {
             @Override public void onDetails(BookingDto b) {
                 BookingDetailsDialog.display(
@@ -83,7 +84,6 @@ public class OperatorHomeFragment extends Fragment {
         });
         rvToday.setAdapter(adapter);
 
-        fabScan.setOnClickListener(v1 -> startScan(null)); // quick scan
 
         return v;
     }
