@@ -10,7 +10,7 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <!-- Header card -->
+        <!-- Header -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -33,18 +33,18 @@
                 android:layout_marginTop="12dp">
 
                 <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
                     android:text="@string/nic"
                     android:textColor="@color/ev_text_muted"
-                    android:layout_marginEnd="8dp" />
+                    android:layout_marginEnd="8dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
 
                 <TextView
                     android:id="@+id/tvNic"
                     style="@style/EV"
+                    android:text="-"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="-" />
+                    android:layout_height="wrap_content"/>
             </LinearLayout>
 
             <LinearLayout
@@ -54,22 +54,22 @@
                 android:layout_marginTop="6dp">
 
                 <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
                     android:text="@string/active"
                     android:textColor="@color/ev_text_muted"
-                    android:layout_marginEnd="8dp" />
+                    android:layout_marginEnd="8dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
 
                 <TextView
                     android:id="@+id/tvActive"
                     style="@style/EV"
+                    android:text="@string/na"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/na" />
+                    android:layout_height="wrap_content"/>
             </LinearLayout>
         </LinearLayout>
 
-        <!-- Edit form card -->
+        <!-- Profile form -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -78,68 +78,52 @@
             android:background="@color/ev_bg_card"
             android:elevation="2dp">
 
-            <TextView
-                style="@style/EV.Subtitle"
-                android:text="@string/first_name"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+            <TextView style="@style/EV.Subtitle" android:text="@string/first_name"
+                android:layout_width="match_parent" android:layout_height="wrap_content"/>
             <EditText
                 android:id="@+id/etFirst"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
                 android:hint="@string/first_name"
                 android:inputType="textPersonName"
                 android:padding="12dp"
                 android:background="@drawable/bg_field"
-                android:layout_marginTop="6dp" />
+                android:layout_marginTop="6dp"
+                android:layout_width="match_parent" android:layout_height="wrap_content"/>
 
-            <TextView
-                style="@style/EV.Subtitle"
-                android:text="@string/last_name"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp" />
+            <TextView style="@style/EV.Subtitle" android:text="@string/last_name"
+                android:layout_marginTop="12dp"
+                android:layout_width="match_parent" android:layout_height="wrap_content"/>
             <EditText
                 android:id="@+id/etLast"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
                 android:hint="@string/last_name"
                 android:inputType="textPersonName"
                 android:padding="12dp"
                 android:background="@drawable/bg_field"
-                android:layout_marginTop="6dp" />
+                android:layout_marginTop="6dp"
+                android:layout_width="match_parent" android:layout_height="wrap_content"/>
 
-            <TextView
-                style="@style/EV.Subtitle"
-                android:text="@string/email"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp" />
+            <TextView style="@style/EV.Subtitle" android:text="@string/email"
+                android:layout_marginTop="12dp"
+                android:layout_width="match_parent" android:layout_height="wrap_content"/>
             <EditText
                 android:id="@+id/etEmail"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
                 android:hint="@string/email"
                 android:inputType="textEmailAddress"
                 android:padding="12dp"
                 android:background="@drawable/bg_field"
-                android:layout_marginTop="6dp" />
+                android:layout_marginTop="6dp"
+                android:layout_width="match_parent" android:layout_height="wrap_content"/>
 
-            <TextView
-                style="@style/EV.Subtitle"
-                android:text="@string/phone"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp" />
+            <TextView style="@style/EV.Subtitle" android:text="@string/phone"
+                android:layout_marginTop="12dp"
+                android:layout_width="match_parent" android:layout_height="wrap_content"/>
             <EditText
                 android:id="@+id/etPhone"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
                 android:hint="@string/phone"
                 android:inputType="phone"
                 android:padding="12dp"
                 android:background="@drawable/bg_field"
-                android:layout_marginTop="6dp" />
+                android:layout_marginTop="6dp"
+                android:layout_width="match_parent" android:layout_height="wrap_content"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -149,23 +133,100 @@
 
                 <Button
                     android:id="@+id/btnSave"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:text="@string/save"
                     android:layout_weight="1"
-                    android:text="@string/save" />
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"/>
 
-                <Space
-                    android:layout_width="12dp"
-                    android:layout_height="1dp" />
+                <Space android:layout_width="12dp" android:layout_height="1dp"/>
 
                 <Button
                     android:id="@+id/btnDeactivate"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
                     android:text="@string/deactivate"
                     android:textAllCaps="false"
-                    android:backgroundTint="@color/ev_error" />
+                    android:backgroundTint="@color/ev_error"
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"/>
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Password card -->
+        <LinearLayout
+            android:layout_marginTop="12dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:background="@color/ev_bg_card"
+            android:elevation="2dp">
+
+            <TextView style="@style/EV.Title"
+                android:text="@string/change_password"
+                android:layout_width="match_parent" android:layout_height="wrap_content"/>
+
+            <TextView style="@style/EV.Subtitle"
+                android:text="@string/current_password"
+                android:layout_marginTop="12dp"
+                android:layout_width="match_parent" android:layout_height="wrap_content"/>
+            <EditText
+                android:id="@+id/etCurPw"
+                android:hint="@string/current_password"
+                android:inputType="textPassword"
+                android:padding="12dp"
+                android:background="@drawable/bg_field"
+                android:layout_marginTop="6dp"
+                android:layout_width="match_parent" android:layout_height="wrap_content"/>
+
+            <TextView style="@style/EV.Subtitle"
+                android:text="@string/new_password"
+                android:layout_marginTop="12dp"
+                android:layout_width="match_parent" android:layout_height="wrap_content"/>
+            <EditText
+                android:id="@+id/etNewPw"
+                android:hint="@string/new_password"
+                android:inputType="textPassword"
+                android:padding="12dp"
+                android:background="@drawable/bg_field"
+                android:layout_marginTop="6dp"
+                android:layout_width="match_parent" android:layout_height="wrap_content"/>
+
+            <TextView style="@style/EV.Subtitle"
+                android:text="@string/confirm_password"
+                android:layout_marginTop="12dp"
+                android:layout_width="match_parent" android:layout_height="wrap_content"/>
+            <EditText
+                android:id="@+id/etNewPw2"
+                android:hint="@string/confirm_password"
+                android:inputType="textPassword"
+                android:padding="12dp"
+                android:background="@drawable/bg_field"
+                android:layout_marginTop="6dp"
+                android:layout_width="match_parent" android:layout_height="wrap_content"/>
+
+            <LinearLayout
+                android:layout_marginTop="18dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btnChangePw"
+                    android:text="@string/change_password"
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"/>
+
+                <Space android:layout_width="12dp" android:layout_height="1dp"/>
+
+                <Button
+                    android:id="@+id/btnDelete"
+                    android:text="@string/delete_account"
+                    android:textAllCaps="false"
+                    android:backgroundTint="@color/ev_error"
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"/>
             </LinearLayout>
         </LinearLayout>
 

@@ -22,9 +22,33 @@ public class OwnerLocalStore {
         db.insertWithOnConflict("owner_profile", null, v, SQLiteDatabase.CONFLICT_REPLACE);
     }
 
+    /** DEPRECATED: kept for compatibility. Avoid using this. */
     public Owner get() {
         SQLiteDatabase db = helper.getReadableDatabase();
         Cursor c = db.rawQuery("SELECT nic, first_name, last_name, email, phone, is_active FROM owner_profile LIMIT 1", null);
+        try {
+            if (c.moveToFirst()) {
+                Owner o = new Owner();
+                o.nic = c.getString(0);
+                o.firstName = c.getString(1);
+                o.lastName = c.getString(2);
+                o.email = c.getString(3);
+                o.phone = c.getString(4);
+                o.isActive = c.getInt(5) == 1;
+                return o;
+            }
+            return null;
+        } finally { c.close(); }
+    }
+
+    /** Always fetch the row for the specified NIC (the logged-in owner). */
+    public Owner getByNic(String nic) {
+        if (nic == null) return null;
+        SQLiteDatabase db = helper.getReadableDatabase();
+        Cursor c = db.rawQuery(
+                "SELECT nic, first_name, last_name, email, phone, is_active " +
+                        "FROM owner_profile WHERE nic = ? LIMIT 1",
+                new String[]{ nic });
         try {
             if (c.moveToFirst()) {
                 Owner o = new Owner();

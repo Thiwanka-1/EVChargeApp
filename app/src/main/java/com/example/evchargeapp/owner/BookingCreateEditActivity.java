@@ -16,16 +16,18 @@ import com.example.evchargeapp.models.BookingCreateRequest;
 import com.example.evchargeapp.models.BookingDto;
 import com.example.evchargeapp.models.BookingUpdateRequest;
 import com.example.evchargeapp.models.StationDto;
+import com.example.evchargeapp.ui.BookingReviewDialog;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 public class BookingCreateEditActivity extends AppCompatActivity {
 
-    private TextView tvTitle, tvDate, tvStart, tvEnd, tvAvailability, tvStationHint;
+    private TextView tvTitle, tvDate, tvStart, tvEnd, tvAvailability;
     private Spinner spStation;
     private Button btnSave, btnCancel;
 
@@ -34,11 +36,12 @@ public class BookingCreateEditActivity extends AppCompatActivity {
 
     private final List<StationDto> stations = new ArrayList<>();
     private final List<String> stationLabels = new ArrayList<>();
+    private static final int TZ_OFFSET_MINUTES_SL = 330; // UTC+5:30 Sri Lanka
 
-    // local-time selections
-    private final Calendar dateLocal  = Calendar.getInstance();
+    // in-local-time selections
+    private final Calendar dateLocal = Calendar.getInstance();
     private final Calendar startLocal = Calendar.getInstance();
-    private final Calendar endLocal   = Calendar.getInstance();
+    private final Calendar endLocal = Calendar.getInstance();
 
     private @Nullable String editingId = null;
 
@@ -46,26 +49,22 @@ public class BookingCreateEditActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_booking_create_edit);
 
-        tvTitle        = findViewById(R.id.tvTitle);
-        spStation      = findViewById(R.id.spStation);
-        tvStationHint  = findViewById(R.id.tvStationHint);
-        tvDate         = findViewById(R.id.tvDate);
-        tvStart        = findViewById(R.id.tvStart);
-        tvEnd          = findViewById(R.id.tvEnd);
+        tvTitle = findViewById(R.id.tvTitle);
+        spStation = findViewById(R.id.spStation);
+        tvDate = findViewById(R.id.tvDate);
+        tvStart = findViewById(R.id.tvStart);
+        tvEnd = findViewById(R.id.tvEnd);
         tvAvailability = findViewById(R.id.tvAvailability);
-        btnSave        = findViewById(R.id.btnSave);
-        btnCancel      = findViewById(R.id.btnCancel);
+        btnSave = findViewById(R.id.btnSave);
+        btnCancel = findViewById(R.id.btnCancel);
 
         String base = getString(R.string.base_url);
         stationsApi = ApiClient.get(this, base).create(StationsService.class);
         bookingsApi = ApiClient.get(this, base).create(BookingsService.class);
 
-        // defaults: snap to 30-min grid; end = +60m
+        // defaults: now and +1h
         startLocal.set(Calendar.MINUTE, (startLocal.get(Calendar.MINUTE) / 30) * 30);
-        startLocal.set(Calendar.SECOND, 0);
-        startLocal.set(Calendar.MILLISECOND, 0);
         endLocal.setTimeInMillis(startLocal.getTimeInMillis() + 60 * 60 * 1000);
-        syncDay(dateLocal, startLocal);
 
         tvDate.setOnClickListener(v -> pickDate());
         tvStart.setOnClickListener(v -> pickTime(true));
@@ -78,7 +77,7 @@ public class BookingCreateEditActivity extends AppCompatActivity {
             @Override public void onNothingSelected(AdapterView<?> parent) {}
         });
 
-        // Are we editing?
+        // Editing?
         editingId = getIntent().getStringExtra("bookingId");
         if (editingId != null) tvTitle.setText(R.string.booking_edit);
 
@@ -88,17 +87,15 @@ public class BookingCreateEditActivity extends AppCompatActivity {
         });
     }
 
-    private void loadStations(Runnable after) {
+    private void loadStations(Runnable after){
         stationsApi.getAll().enqueue(new Callback<List<StationDto>>() {
             @Override public void onResponse(Call<List<StationDto>> call, Response<List<StationDto>> res) {
                 stations.clear(); stationLabels.clear();
-                if (res.isSuccessful() && res.body() != null) {
-                    for (StationDto s : res.body()) {
+                if (res.isSuccessful() && res.body()!=null){
+                    for (StationDto s : res.body()){
                         if (s.isActive) {
                             stations.add(s);
-                            String label = (s.name!=null && !s.name.trim().isEmpty())
-                                    ? s.name + " (" + s.stationId + ")"
-                                    : s.stationId;
+                            String label = (s.name!=null && s.name.trim().length()>0) ? s.name + " ("+s.stationId+")" : s.stationId;
                             stationLabels.add(label);
                         }
                     }
@@ -118,30 +115,25 @@ public class BookingCreateEditActivity extends AppCompatActivity {
         });
     }
 
-    private void fetchBooking(String id) {
+    private void fetchBooking(String id){
         bookingsApi.getById(id).enqueue(new Callback<BookingDto>() {
             @Override public void onResponse(Call<BookingDto> call, Response<BookingDto> res) {
-                if (!res.isSuccessful() || res.body() == null) {
-                    Toast.makeText(BookingCreateEditActivity.this, "Failed to load booking", Toast.LENGTH_SHORT).show();
-                    return;
-                }
+                if (!res.isSuccessful() || res.body()==null) { Toast.makeText(BookingCreateEditActivity.this, "Failed to load booking", Toast.LENGTH_SHORT).show(); return; }
                 BookingDto b = res.body();
 
-                // station (CANNOT change station when editing – backend disallows it)
+                // station
                 int idx = 0;
-                for (int i = 0; i < stations.size(); i++) {
+                for (int i=0;i<stations.size();i++){
                     if (stations.get(i).stationId.equals(b.stationId)) { idx = i; break; }
                 }
                 spStation.setSelection(idx);
-                spStation.setEnabled(false);
-                tvStationHint.setVisibility(View.VISIBLE);
 
                 // times (ISO -> local calendars)
                 Long s = parseIsoUtc(b.startTimeUtc);
                 Long e = parseIsoUtc(b.endTimeUtc);
                 if (s != null) startLocal.setTimeInMillis(s);
                 if (e != null) endLocal.setTimeInMillis(e);
-                syncDay(dateLocal, startLocal);
+                dateLocal.setTimeInMillis(startLocal.getTimeInMillis());
 
                 renderSelections();
             }
@@ -151,19 +143,20 @@ public class BookingCreateEditActivity extends AppCompatActivity {
         });
     }
 
-    private void renderSelections() {
+    private void renderSelections(){
         tvDate.setText(fmtLocal(dateLocal.getTimeInMillis(), "yyyy-MM-dd"));
         tvStart.setText(fmtLocal(startLocal.getTimeInMillis(), "HH:mm"));
         tvEnd.setText(fmtLocal(endLocal.getTimeInMillis(), "HH:mm"));
         loadAvailability();
     }
 
-    private void pickDate() {
+    private void pickDate(){
         DatePickerDialog dlg = new DatePickerDialog(this,
                 (view, y, m, d) -> {
                     dateLocal.set(Calendar.YEAR, y);
                     dateLocal.set(Calendar.MONTH, m);
                     dateLocal.set(Calendar.DAY_OF_MONTH, d);
+                    // snap start/end to same day
                     syncDay(startLocal, dateLocal);
                     syncDay(endLocal, dateLocal);
                     renderSelections();
@@ -174,13 +167,11 @@ public class BookingCreateEditActivity extends AppCompatActivity {
         dlg.show();
     }
 
-    private void pickTime(boolean start) {
+    private void pickTime(boolean start){
         Calendar target = start ? startLocal : endLocal;
         new TimePickerDialog(this, (view, hour, minute) -> {
             target.set(Calendar.HOUR_OF_DAY, hour);
-            target.set(Calendar.MINUTE, minute - (minute % 5)); // 5-minute snap
-            target.set(Calendar.SECOND, 0);
-            target.set(Calendar.MILLISECOND, 0);
+            target.set(Calendar.MINUTE, minute - (minute % 5)); // snap to 5-min
             renderSelections();
         }, target.get(Calendar.HOUR_OF_DAY), target.get(Calendar.MINUTE), true).show();
     }
@@ -191,77 +182,102 @@ public class BookingCreateEditActivity extends AppCompatActivity {
             tvAvailability.setText(getString(R.string.availability_hint));
             return;
         }
-        String stationId = stations.get(pos).stationId;
-        String date = fmtUtc(dateLocal.getTimeInMillis(), "yyyy-MM-dd");
 
-        bookingsApi.availability(stationId, date).enqueue(new Callback<BookingsService.AvailabilityResponse>() {
-            @Override public void onResponse(Call<BookingsService.AvailabilityResponse> call, Response<BookingsService.AvailabilityResponse> res) {
-                if (!res.isSuccessful() || res.body()==null || res.body().availability==null) {
-                    tvAvailability.setText(getString(R.string.availability_hint)); return;
-                }
-                // Render a few slots around chosen hour
-                String hour = fmtLocal(startLocal.getTimeInMillis(), "HH");
-                StringBuilder sb = new StringBuilder();
-                int shown = 0;
-                for (BookingsService.AvailabilityResponse.Slot s : res.body().availability) {
-                    if (s.time.startsWith(hour) && shown < 4) {
-                        if (shown == 0) sb.append("Availability: ");
-                        else sb.append("  |  ");
-                        sb.append(s.time).append(" → ").append(s.availableSlots);
-                        shown++;
+        String stationId = stations.get(pos).stationId;
+
+        // BACKEND expects LOCAL calendar day string
+        String dateLocalStr = fmtLocal(dateLocal.getTimeInMillis(), "yyyy-MM-dd");
+
+        bookingsApi.availability(stationId, dateLocalStr, TZ_OFFSET_MINUTES_SL)
+                .enqueue(new retrofit2.Callback<BookingsService.AvailabilityResponse>() {
+                    @Override
+                    public void onResponse(retrofit2.Call<BookingsService.AvailabilityResponse> call,
+                                           retrofit2.Response<BookingsService.AvailabilityResponse> res) {
+                        if (!res.isSuccessful() || res.body() == null || res.body().availability == null) {
+                            tvAvailability.setText(getString(R.string.availability_hint));
+                            return;
+                        }
+
+                        // Show a compact sample around chosen start hour
+                        String startHH = fmtLocal(startLocal.getTimeInMillis(), "HH");
+                        StringBuilder sb = new StringBuilder("Availability (30-min slots): ");
+                        int count = 0;
+                        for (BookingsService.AvailabilityResponse.Slot s : res.body().availability) {
+                            if (s.time.startsWith(startHH) && count < 4) {
+                                if (count > 0) sb.append("  |  ");
+                                sb.append(s.time).append(": ").append(s.availableSlots);
+                                count++;
+                            }
+                        }
+                        if (count == 0) sb = new StringBuilder(getString(R.string.availability_hint));
+                        tvAvailability.setText(sb.toString());
                     }
-                }
-                tvAvailability.setText(shown == 0 ? getString(R.string.availability_hint) : sb.toString());
-            }
-            @Override public void onFailure(Call<BookingsService.AvailabilityResponse> call, Throwable t) {
-                tvAvailability.setText(getString(R.string.availability_hint));
-            }
-        });
+
+                    @Override
+                    public void onFailure(retrofit2.Call<BookingsService.AvailabilityResponse> call, Throwable t) {
+                        tvAvailability.setText(getString(R.string.availability_hint));
+                    }
+                });
     }
 
-    private void save() {
+    // ---- SAVE now opens review dialog first ----
+    private void save(){
         int pos = spStation.getSelectedItemPosition();
         if (pos < 0 || pos >= stations.size()) { Toast.makeText(this, "Select a station", Toast.LENGTH_SHORT).show(); return; }
-
-        if (endLocal.getTimeInMillis() <= startLocal.getTimeInMillis()) {
+        if (endLocal.getTimeInMillis() <= startLocal.getTimeInMillis()){
             Toast.makeText(this, "End time must be after start time", Toast.LENGTH_SHORT).show(); return;
         }
 
-        String stationId = stations.get(pos).stationId;
+        StationDto st = stations.get(pos);
+        String stationLabel = (st.name!=null && !st.name.trim().isEmpty()) ? st.name + " ("+st.stationId+")" : st.stationId;
+
+        String dateText  = fmtLocal(dateLocal.getTimeInMillis(), "yyyy-MM-dd");
+        String startText = fmtLocal(startLocal.getTimeInMillis(), "HH:mm");
+        String endText   = fmtLocal(endLocal.getTimeInMillis(), "HH:mm");
+        String duration  = humanDuration(endLocal.getTimeInMillis() - startLocal.getTimeInMillis());
+
         String isoStart = toIsoUtc(startLocal.getTimeInMillis());
         String isoEnd   = toIsoUtc(endLocal.getTimeInMillis());
 
-        if (editingId == null) {
-            BookingCreateRequest body = new BookingCreateRequest();
-            body.stationId = stationId;
-            body.startTimeUtc = isoStart;
-            body.endTimeUtc   = isoEnd;
+        String mode = (editingId == null) ? "create" : "update";
 
-            bookingsApi.create(body).enqueue(new Callback<BookingDto>() {
-                @Override public void onResponse(Call<BookingDto> call, Response<BookingDto> res) {
-                    if (res.isSuccessful()) { Toast.makeText(BookingCreateEditActivity.this, "Created", Toast.LENGTH_SHORT).show(); finish(); }
-                    else Toast.makeText(BookingCreateEditActivity.this, "Server rejected (7-day / overlap / 12h rules)", Toast.LENGTH_LONG).show();
-                }
-                @Override public void onFailure(Call<BookingDto> call, Throwable t) {
-                    Toast.makeText(BookingCreateEditActivity.this, "Network error", Toast.LENGTH_SHORT).show();
-                }
-            });
-        } else {
-            // EDIT: backend only allows time change (not station)
-            BookingUpdateRequest body = new BookingUpdateRequest();
-            body.startTimeUtc = isoStart;
-            body.endTimeUtc   = isoEnd;
+        BookingReviewDialog
+                .newInstance(mode, stationLabel, dateText, startText, endText, duration)
+                .setDecision(() -> {
+                    if (editingId == null){
+                        // CREATE
+                        BookingCreateRequest body = new BookingCreateRequest();
+                        body.stationId = st.stationId;
+                        body.startTimeUtc = isoStart;
+                        body.endTimeUtc = isoEnd;
 
-            bookingsApi.update(editingId, body).enqueue(new Callback<Void>() {
-                @Override public void onResponse(Call<Void> call, Response<Void> res) {
-                    if (res.isSuccessful()) { Toast.makeText(BookingCreateEditActivity.this, "Updated", Toast.LENGTH_SHORT).show(); finish(); }
-                    else Toast.makeText(BookingCreateEditActivity.this, "Update refused (12h / overlap / 7-day)", Toast.LENGTH_LONG).show();
-                }
-                @Override public void onFailure(Call<Void> call, Throwable t) {
-                    Toast.makeText(BookingCreateEditActivity.this, "Network error", Toast.LENGTH_SHORT).show();
-                }
-            });
-        }
+                        bookingsApi.create(body).enqueue(new Callback<BookingDto>() {
+                            @Override public void onResponse(Call<BookingDto> call, Response<BookingDto> res) {
+                                if (res.isSuccessful()) { Toast.makeText(BookingCreateEditActivity.this, "Created", Toast.LENGTH_SHORT).show(); finish(); }
+                                else Toast.makeText(BookingCreateEditActivity.this, "Server rejected (7-day / overlap / 12h rules)", Toast.LENGTH_LONG).show();
+                            }
+                            @Override public void onFailure(Call<BookingDto> call, Throwable t) {
+                                Toast.makeText(BookingCreateEditActivity.this, "Network error", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    } else {
+                        // UPDATE
+                        BookingUpdateRequest body = new BookingUpdateRequest();
+                        body.startTimeUtc = isoStart;
+                        body.endTimeUtc   = isoEnd;
+
+                        bookingsApi.update(editingId, body).enqueue(new Callback<Void>() {
+                            @Override public void onResponse(Call<Void> call, Response<Void> res) {
+                                if (res.isSuccessful()) { Toast.makeText(BookingCreateEditActivity.this, "Updated", Toast.LENGTH_SHORT).show(); finish(); }
+                                else Toast.makeText(BookingCreateEditActivity.this, "Update refused (12h / overlap / 7-day)", Toast.LENGTH_LONG).show();
+                            }
+                            @Override public void onFailure(Call<Void> call, Throwable t) {
+                                Toast.makeText(BookingCreateEditActivity.this, "Network error", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+                })
+                .show(getSupportFragmentManager(), "BookingReview");
     }
 
     // ---- time helpers (API 24 safe) ----
@@ -299,5 +315,14 @@ public class BookingCreateEditActivity extends AppCompatActivity {
         SimpleDateFormat out = new SimpleDateFormat(pattern, Locale.US);
         out.setTimeZone(TimeZone.getTimeZone("UTC"));
         return out.format(new Date(ms));
+    }
+
+    private static String humanDuration(long ms){
+        long mins = Math.max(0, ms / 60000L);
+        long h = mins / 60L;
+        long m = mins % 60L;
+        if (h == 0) return m + "m";
+        if (m == 0) return h + "h";
+        return h + "h " + m + "m";
     }
 }

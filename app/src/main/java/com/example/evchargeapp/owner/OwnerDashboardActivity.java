@@ -33,7 +33,7 @@ public class OwnerDashboardActivity extends AppCompatActivity {
             Fragment f;
             int id = item.getItemId();
             if (id == R.id.nav_owner_bookings) f = new OwnerBookingsFragment();
-            else if (id == R.id.nav_owner_map) f = new OwnerMapFragment();
+            else if (id == R.id.nav_owner_availability) f = new OwnerAvailabilityFragment();
             else if (id == R.id.nav_owner_profile) f = new OwnerProfileFragment();
             else f = new OwnerHomeFragment();
             getSupportFragmentManager().beginTransaction()

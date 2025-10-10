@@ -223,21 +223,25 @@ public class OwnerBookingsFragment extends Fragment {
         tvEmpty.setVisibility(out.isEmpty() ? View.VISIBLE : View.GONE);
     }
 
-    private void cancelBooking(String id) {
-        api.cancel(id).enqueue(new Callback<Void>() {
-            @Override public void onResponse(Call<Void> call, Response<Void> res) {
-                if (!isAdded()) return;
-                if (res.isSuccessful()) {
-                    Toast.makeText(requireContext(), R.string.cancelled, Toast.LENGTH_SHORT).show();
-                    loadFromServer();
-                } else {
-                    Toast.makeText(requireContext(), R.string.cannot_cancel_rule, Toast.LENGTH_LONG).show();
-                }
-            }
-            @Override public void onFailure(Call<Void> call, Throwable t) {
-                if (!isAdded()) return;
-                Toast.makeText(requireContext(), R.string.network_error, Toast.LENGTH_SHORT).show();
-            }
-        });
+    private void cancelBooking(String id){
+        new android.app.AlertDialog.Builder(requireContext())
+                .setTitle(R.string.cancel_booking_title)
+                .setMessage(R.string.cancel_booking_msg)
+                .setNegativeButton(R.string.no, null)
+                .setPositiveButton(R.string.yes, (d,w)-> {
+                    api.cancel(id).enqueue(new Callback<Void>() {
+                        @Override public void onResponse(Call<Void> call, Response<Void> res) {
+                            if (!isAdded()) return;
+                            if (res.isSuccessful()) { Toast.makeText(requireContext(), "Cancelled", Toast.LENGTH_SHORT).show(); loadFromServer(); }
+                            else Toast.makeText(requireContext(), "Cannot cancel (12h rule / status)", Toast.LENGTH_LONG).show();
+                        }
+                        @Override public void onFailure(Call<Void> call, Throwable t) {
+                            if (!isAdded()) return;
+                            Toast.makeText(requireContext(), "Network error", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                })
+                .show();
     }
+
 }

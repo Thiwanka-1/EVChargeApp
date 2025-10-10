@@ -6,9 +6,10 @@
     <item android:id="@+id/nav_owner_bookings"
         android:title="@string/tab_bookings"
         android:icon="@android:drawable/ic_menu_agenda"/>
-    <item android:id="@+id/nav_owner_map"
-        android:title="@string/tab_map"
-        android:icon="@android:drawable/ic_menu_mylocation"/>
+    <item
+        android:id="@+id/nav_owner_availability"
+        android:title="@string/availability"
+        android:icon="@android:drawable/ic_menu_week"/>
     <item android:id="@+id/nav_owner_profile"
         android:title="@string/tab_profile"
         android:icon="@android:drawable/ic_menu_manage"/>

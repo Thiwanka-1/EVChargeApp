@@ -101,6 +101,58 @@
         <string name="username">Username</string>
         <string name="new_password">New password (optional)</string>
         <string name="confirm_password">Confirm password</string>
+    <string name="availability">Availability</string>
+    <string name="legend">Legend:</string>
+    <string name="legend_full">Full</string>
+    <string name="legend_limited">Limited</string>
+    <string name="legend_good">Good</string>
+    <string name="no_data">No data</string>
+    <string name="av_meta_loading">Loading availability for %1$s…</string>
+    <string name="av_meta_done">%1$s – %2$s</string>
+    <string name="av_meta_failed">Failed to load availability</string>
+
+
+
+
+    <string name="review_create_title">Review your reservation</string>
+    <string name="review_update_title">Review your changes</string>
+    <string name="review_summary">Please verify the details</string>
+    <string name="duration">Duration</string>
+    <string name="back">Back</string>
+    <string name="confirm">Confirm</string>
+
+    <string name="cancel_booking_title">Cancel reservation?</string>
+    <string name="cancel_booking_msg">Are you sure you want to cancel this booking?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="review_note">You can still edit if anything looks wrong. Charges start only after the operator scans your QR at the station.</string>
+
+
+    <string name="deactivate_q">Deactivate account?</string>
+    <string name="deactivate_note">You won’t be able to create new bookings until back-office reactivates your account.</string>
+    <string name="deactivated">Account deactivated</string>
+    <string name="deactivation_failed">Deactivation failed</string>
+    <string name="profile_updated">Profile updated</string>
+    <string name="update_failed">Update failed</string>
+    <string name="err_required_name_email">First name and Email are required</string>
+
+    <string name="select_station">Select a station.</string>
+
+    <!-- password -->
+    <string name="change_password">Change password</string>
+    <string name="current_password">Current password</string>
+
+    <string name="err_pw_all_fields">Please fill all password fields</string>
+    <string name="err_pw_mismatch">New passwords do not match</string>
+    <string name="err_pw_length">Password must be at least 6 characters</string>
+    <string name="pw_changed">Password changed</string>
+    <string name="pw_change_failed">Password change failed (check your current password)</string>
+
+    <!-- delete -->
+    <string name="delete_account">Delete account</string>
+    <string name="delete_note">This permanently removes your account and future access. Continue?</string>
+    <string name="account_deleted">Account deleted</string>
+    <string name="delete_failed">Delete failed</string>
 
 
     <!-- API base -->
